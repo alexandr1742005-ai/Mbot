@@ -1,0 +1,843 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mbot — Бот для бизнеса</title>
+    <meta name="description" content="Telegram-бот для барбершопов, салонов красоты, стоматологий и любого бизнеса с записью клиентов. Автоматические напоминания, онлайн-запись, сбор отзывов.">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700;800;900&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        /* ===== RESET ===== */
+        *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+        :root {
+            --bg: #000000;
+            --bg-alt: #0a0a0a;
+            --bg-card: #111111;
+            --bg-card-hover: #1a1a1a;
+            --accent: #9B1B30;
+            --accent-light: #B82E46;
+            --accent-glow: rgba(155, 27, 48, 0.25);
+            --accent-subtle: rgba(155, 27, 48, 0.06);
+            --green: #00c853;
+            --green-glow: rgba(0, 200, 83, 0.2);
+            --red: #ff4444;
+            --white: #ffffff;
+            --text-primary: #ffffff;
+            --text-secondary: #999999;
+            --text-muted: #666666;
+            --border: rgba(255,255,255,0.08);
+            --heading-font: 'Montserrat', sans-serif;
+            --body-font: 'Inter', sans-serif;
+        }
+
+        html { scroll-behavior: smooth; font-size: 16px; }
+
+        body {
+            font-family: var(--body-font);
+            background: var(--bg);
+            color: var(--text-primary);
+            line-height: 1.6;
+            overflow-x: hidden;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        a { text-decoration: none; color: inherit; }
+        img { max-width: 100%; display: block; }
+        button, input, textarea { font-family: inherit; border: none; outline: none; }
+
+        .container { max-width: 1200px; margin: 0 auto; padding: 0 24px; }
+
+        /* ===== ANIMATIONS ===== */
+        @keyframes fadeUp {
+            from { opacity: 0; transform: translateY(40px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        @keyframes float {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-10px); }
+        }
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.4; }
+        }
+        @keyframes gradientShift {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+        @keyframes chatBounce {
+            0%, 100% { transform: translateY(0) scale(1); }
+            50% { transform: translateY(-5px) scale(1.01); }
+        }
+
+        .anim { opacity: 0; transform: translateY(30px); transition: opacity 0.6s ease, transform 0.6s ease; }
+        .anim.visible { opacity: 1; transform: translateY(0); }
+
+        /* ===== NAVBAR ===== */
+        .navbar {
+            position: fixed; top: 0; left: 0; right: 0; z-index: 1000;
+            padding: 20px 0; transition: all 0.3s; background: transparent;
+        }
+        .navbar.scrolled {
+            background: rgba(0,0,0,0.92); backdrop-filter: blur(20px);
+            border-bottom: 1px solid var(--border); padding: 14px 0;
+        }
+        .navbar .container { display: flex; align-items: center; justify-content: space-between; }
+        .logo { display: flex; align-items: center; gap: 12px; font-family: var(--heading-font); font-weight: 800; font-size: 1.4rem; color: var(--white); }
+        .logo-icon { width: 36px; height: 36px; background: var(--accent); border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 1.1rem; }
+        .nav-links { display: flex; align-items: center; gap: 36px; list-style: none; }
+        .nav-links a { color: var(--text-secondary); font-size: 0.9rem; font-weight: 500; transition: color 0.3s; font-family: var(--body-font); }
+        .nav-links a:hover { color: var(--white); }
+        .btn {
+            display: inline-flex; align-items: center; justify-content: center; gap: 8px;
+            padding: 14px 28px; border-radius: 8px; font-weight: 600; font-size: 0.9rem;
+            cursor: pointer; transition: all 0.3s; border: none; font-family: var(--body-font);
+        }
+        .btn-accent {
+            background: var(--accent); color: #fff;
+        }
+        .btn-accent:hover { background: var(--accent-light); transform: translateY(-2px); box-shadow: 0 8px 30px var(--accent-glow); }
+        .btn-outline {
+            background: transparent; color: var(--white); border: 1px solid rgba(255,255,255,0.2);
+        }
+        .btn-outline:hover { border-color: rgba(255,255,255,0.4); background: rgba(255,255,255,0.03); }
+        .btn-white { background: #fff; color: var(--accent); font-weight: 700; }
+        .btn-white:hover { transform: translateY(-2px); box-shadow: 0 8px 30px rgba(0,0,0,0.3); }
+        .btn-green { background: var(--green); color: #fff; }
+        .btn-green:hover { transform: translateY(-2px); box-shadow: 0 8px 30px var(--green-glow); }
+        .btn-lg { padding: 18px 40px; font-size: 1rem; border-radius: 8px; }
+        .mobile-btn { display: none; background: none; cursor: pointer; padding: 8px; }
+
+        /* ===== HERO ===== */
+        .hero {
+            min-height: 100vh; display: flex; align-items: center;
+            padding: 140px 0 100px; position: relative; overflow: hidden;
+        }
+        .hero::before {
+            content: ''; position: absolute; top: -300px; right: -200px;
+            width: 700px; height: 700px;
+            background: radial-gradient(circle, var(--accent-glow), transparent 70%);
+            border-radius: 50%; pointer-events: none;
+        }
+        .hero .container {
+            display: grid; grid-template-columns: 1fr 1fr; gap: 80px;
+            align-items: center; position: relative; z-index: 1;
+        }
+        .hero-badge {
+            display: inline-flex; align-items: center; gap: 8px;
+            background: rgba(155,27,48,0.06); border: 1px solid rgba(155,27,48,0.15);
+            padding: 8px 16px; border-radius: 100px;
+            font-size: 0.82rem; font-weight: 500; color: var(--accent-light);
+            margin-bottom: 28px; animation: fadeUp 0.6s ease;
+        }
+        .hero-badge .dot {
+            width: 8px; height: 8px; background: var(--green);
+            border-radius: 50%; animation: pulse 2s infinite;
+        }
+        .hero h1 {
+            font-family: var(--heading-font);
+            font-size: clamp(2.4rem, 5vw, 4rem); font-weight: 800;
+            line-height: 1.1; margin-bottom: 28px; letter-spacing: -0.02em;
+            animation: fadeUp 0.6s ease 0.1s both;
+        }
+        .hero h1 em {
+            font-style: normal; color: var(--accent);
+        }
+        .hero-desc {
+            font-size: 1.1rem; color: var(--text-secondary); line-height: 1.8;
+            margin-bottom: 40px; animation: fadeUp 0.6s ease 0.2s both;
+        }
+        .hero-desc ul { list-style: none; margin-top: 14px; }
+        .hero-desc li { padding: 5px 0; display: flex; align-items: center; gap: 12px; }
+        .hero-desc li::before { content: '→'; color: var(--accent); font-weight: 700; font-size: 0.9rem; }
+        .hero-btns { display: flex; gap: 16px; flex-wrap: wrap; animation: fadeUp 0.6s ease 0.3s both; }
+        .hero-stats {
+            display: flex; gap: 48px; margin-top: 56px;
+            animation: fadeUp 0.6s ease 0.4s both;
+        }
+        .hero-stats .val {
+            font-family: var(--heading-font); font-size: 2rem; font-weight: 800;
+            color: var(--accent);
+        }
+        .hero-stats .label { font-size: 0.82rem; color: var(--text-muted); margin-top: 4px; }
+
+        /* ===== PHONE MOCKUP ===== */
+        .hero-visual { display: flex; justify-content: center; animation: fadeUp 0.8s ease 0.4s both; }
+        .phone {
+            width: 290px; background: #111; border-radius: 40px; padding: 12px;
+            box-shadow: 0 20px 80px rgba(0,0,0,0.6), 0 0 80px var(--accent-glow);
+            animation: float 6s ease-in-out infinite;
+        }
+        .phone-notch { width: 110px; height: 26px; background: #000; border-radius: 0 0 14px 14px; margin: 0 auto 8px; }
+        .phone-screen { background: #0a0a0a; border-radius: 28px; padding: 16px; min-height: 460px; overflow: hidden; }
+        .ch-hdr { text-align: center; padding: 6px 0 14px; border-bottom: 1px solid var(--border); margin-bottom: 14px; }
+        .ch-av { width: 42px; height: 42px; background: var(--accent); border-radius: 50%; margin: 0 auto 6px; display: flex; align-items: center; justify-content: center; font-size: 1.1rem; }
+        .ch-nm { font-weight: 700; font-size: 0.82rem; }
+        .ch-st { font-size: 0.68rem; color: var(--green); }
+        .ch-m {
+            background: rgba(155,27,48,0.08); border-radius: 12px 12px 12px 2px;
+            padding: 10px 12px; margin-bottom: 8px; font-size: 0.76rem; line-height: 1.5; max-width: 85%;
+            animation: chatBounce 3s ease-in-out infinite;
+        }
+        .ch-m.u {
+            background: rgba(255,255,255,0.05); border-radius: 12px 12px 2px 12px;
+            margin-left: auto;
+        }
+        .ch-br { display: flex; gap: 5px; margin-top: 6px; }
+        .ch-b { background: var(--accent); color: #fff; padding: 7px 12px; border-radius: 8px; font-size: 0.72rem; font-weight: 600; }
+        .ch-b.o { background: transparent; border: 1px solid rgba(255,255,255,0.1); color: var(--text-secondary); }
+
+        /* ===== SECTIONS ===== */
+        section { padding: 120px 0; position: relative; }
+        .sect-dark { background: var(--bg-alt); }
+        .sect-label {
+            display: inline-flex; align-items: center; gap: 8px;
+            background: rgba(155,27,48,0.05); border: 1px solid rgba(155,27,48,0.12);
+            padding: 6px 14px; border-radius: 100px; font-size: 0.75rem; font-weight: 600;
+            color: var(--accent); text-transform: uppercase; letter-spacing: 1px; margin-bottom: 20px;
+        }
+        .sect-title {
+            font-family: var(--heading-font); font-size: clamp(1.8rem, 4vw, 3rem);
+            font-weight: 800; line-height: 1.15; margin-bottom: 20px; letter-spacing: -0.01em;
+        }
+        .sect-title.hashtag::before { content: '# '; color: var(--accent); }
+        .sect-text { font-size: 1.05rem; color: var(--text-secondary); max-width: 600px; line-height: 1.7; }
+        .sect-text.center { margin: 0 auto; }
+        .text-c { text-align: center; }
+
+        /* ===== PROBLEMS ===== */
+        .probs-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 80px; margin-top: 56px; align-items: center; }
+        .prob-card {
+            display: flex; gap: 16px; padding: 20px 24px; border-radius: 8px;
+            background: var(--bg-card); border: 1px solid var(--border); margin-bottom: 16px;
+            transition: all 0.3s;
+        }
+        .prob-card:hover { background: var(--bg-card-hover); border-color: rgba(155,27,48,0.15); transform: translateX(4px); }
+        .prob-icon { width: 48px; height: 48px; min-width: 48px; background: rgba(155,27,48,0.08); border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 1.3rem; }
+        .prob-title { font-weight: 700; margin-bottom: 2px; font-size: 0.95rem; }
+        .prob-desc { font-size: 0.85rem; color: var(--text-muted); line-height: 1.5; }
+        .loss-box { background: var(--bg-card); border: 1px solid rgba(155,27,48,0.1); border-radius: 12px; padding: 48px; text-align: center; }
+        .loss-val { font-family: var(--heading-font); font-size: 3.5rem; font-weight: 900; color: var(--red); margin: 12px 0 8px; }
+        .loss-per { font-size: 0.9rem; color: var(--text-muted); }
+        .loss-lbl { font-size: 1rem; color: var(--text-secondary); }
+
+        /* ===== FEATURES ===== */
+        .feat-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 24px; margin-top: 56px; }
+        .feat-card {
+            background: var(--bg-card); border: 1px solid var(--border); border-radius: 12px;
+            padding: 32px; transition: all 0.4s; position: relative; overflow: hidden;
+        }
+        .feat-card::after {
+            content: ''; position: absolute; top: 0; left: 0; right: 0; height: 3px;
+            background: var(--accent); opacity: 0; transition: opacity 0.3s;
+        }
+        .feat-card:hover { background: var(--bg-card-hover); transform: translateY(-4px); border-color: rgba(155,27,48,0.15); }
+        .feat-card:hover::after { opacity: 1; }
+        .feat-icon { width: 52px; height: 52px; background: rgba(155,27,48,0.08); border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 1.5rem; margin-bottom: 20px; }
+        .feat-title { font-family: var(--heading-font); font-weight: 700; font-size: 1.05rem; margin-bottom: 10px; }
+        .feat-desc { font-size: 0.88rem; color: var(--text-muted); line-height: 1.6; }
+
+        /* ===== SCREENSHOTS ===== */
+        .shots-slider {
+            display: flex; gap: 24px; margin-top: 56px; overflow-x: auto;
+            padding: 20px 0 40px; scroll-snap-type: x mandatory;
+            -webkit-overflow-scrolling: touch; scrollbar-width: none;
+        }
+        .shots-slider::-webkit-scrollbar { display: none; }
+        .shot-card {
+            min-width: 280px; background: var(--bg-card); border: 1px solid var(--border);
+            border-radius: 12px; padding: 24px; scroll-snap-align: start;
+            transition: all 0.3s; flex-shrink: 0;
+        }
+        .shot-card:hover { border-color: rgba(155,27,48,0.2); transform: translateY(-4px); }
+        .shot-label { font-size: 0.72rem; font-weight: 600; color: var(--accent); text-transform: uppercase; letter-spacing: 1px; margin-bottom: 16px; }
+        .shot-phone { background: #0a0a0a; border-radius: 16px; padding: 16px; min-height: 300px; }
+        .shot-m { background: rgba(155,27,48,0.06); border-radius: 10px 10px 10px 2px; padding: 10px 12px; margin-bottom: 8px; font-size: 0.73rem; line-height: 1.5; }
+        .shot-m.r { background: rgba(255,255,255,0.04); border-radius: 10px 10px 2px 10px; margin-left: 20%; }
+        .shot-btns { display: flex; flex-wrap: wrap; gap: 5px; margin-top: 8px; }
+        .shot-b { background: var(--accent); color: #fff; padding: 6px 10px; border-radius: 6px; font-size: 0.68rem; font-weight: 600; }
+        .shot-b.o { background: transparent; border: 1px solid var(--border); color: var(--text-secondary); }
+        .shot-bottom { text-align: center; margin-top: 14px; font-size: 0.88rem; font-weight: 600; color: var(--text-secondary); }
+
+        /* ===== FOR WHOM ===== */
+        .whom-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; margin-top: 56px; }
+        .whom-card {
+            display: flex; align-items: center; gap: 16px; background: var(--bg-card);
+            border: 1px solid var(--border); border-radius: 8px; padding: 24px;
+            transition: all 0.3s; cursor: default;
+        }
+        .whom-card:hover { border-color: rgba(155,27,48,0.15); transform: translateY(-2px); background: var(--bg-card-hover); }
+        .whom-icon { width: 52px; height: 52px; min-width: 52px; background: rgba(155,27,48,0.06); border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 1.4rem; }
+        .whom-name { font-family: var(--heading-font); font-weight: 700; font-size: 0.95rem; }
+        .whom-desc { font-size: 0.8rem; color: var(--text-muted); margin-top: 2px; }
+
+        /* ===== BENEFITS ===== */
+        .ben-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 24px; margin-top: 56px; }
+        .ben-card { background: var(--bg-card); border: 1px solid var(--border); border-radius: 12px; padding: 28px; text-align: center; transition: all 0.3s; }
+        .ben-card:hover { border-color: rgba(0,200,83,0.15); transform: translateY(-3px); }
+        .ben-check { width: 40px; height: 40px; background: rgba(0,200,83,0.08); border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 16px; font-size: 1rem; color: var(--green); }
+        .ben-title { font-family: var(--heading-font); font-weight: 700; font-size: 0.95rem; margin-bottom: 8px; }
+        .ben-desc { font-size: 0.85rem; color: var(--text-muted); line-height: 1.5; }
+
+        /* ===== STEPS ===== */
+        .steps { display: grid; grid-template-columns: repeat(4, 1fr); gap: 32px; margin-top: 56px; position: relative; }
+        .steps::before { content: ''; position: absolute; top: 36px; left: 60px; right: 60px; height: 1px; background: rgba(155,27,48,0.2); }
+        .step { text-align: center; position: relative; z-index: 1; }
+        .step-num {
+            width: 72px; height: 72px; background: var(--bg-card); border: 2px solid var(--accent);
+            border-radius: 50%; display: flex; align-items: center; justify-content: center;
+            font-family: var(--heading-font); font-size: 1.4rem; font-weight: 800;
+            color: var(--accent); margin: 0 auto 20px; transition: all 0.3s;
+        }
+        .step:hover .step-num { background: var(--accent); color: #fff; transform: scale(1.1); }
+        .step-title { font-family: var(--heading-font); font-weight: 700; font-size: 0.95rem; margin-bottom: 6px; }
+        .step-desc { font-size: 0.82rem; color: var(--text-muted); }
+
+        /* ===== VIDEO ===== */
+        .video-wrap {
+            max-width: 800px; margin: 56px auto 0; border-radius: 12px; overflow: hidden;
+            border: 1px solid var(--border); background: var(--bg-card); aspect-ratio: 16/9;
+            display: flex; align-items: center; justify-content: center;
+        }
+        .video-play {
+            width: 80px; height: 80px; background: var(--accent); border-radius: 50%;
+            display: flex; align-items: center; justify-content: center;
+            cursor: pointer; transition: all 0.3s; box-shadow: 0 8px 40px var(--accent-glow);
+        }
+        .video-play:hover { transform: scale(1.1); }
+        .video-play svg { width: 28px; height: 28px; margin-left: 4px; }
+
+        /* ===== PRICING ===== */
+        .price-card {
+            max-width: 560px; margin: 56px auto 0; background: var(--bg-card);
+            border: 1px solid rgba(155,27,48,0.12); border-radius: 16px; padding: 56px;
+            text-align: center; position: relative; overflow: hidden;
+        }
+        .price-card::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 4px; background: var(--accent); }
+        .price-tag { display: inline-block; background: var(--accent); padding: 6px 16px; border-radius: 100px; font-size: 0.72rem; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 24px; }
+        .price-val { font-family: var(--heading-font); font-size: 3.5rem; font-weight: 900; margin-bottom: 4px; }
+        .price-val span { font-size: 1.1rem; font-weight: 400; color: var(--text-muted); }
+        .price-per { font-size: 0.88rem; color: var(--text-muted); margin-bottom: 36px; }
+        .price-list { text-align: left; list-style: none; margin-bottom: 40px; }
+        .price-list li { display: flex; align-items: center; gap: 12px; padding: 10px 0; border-bottom: 1px solid var(--border); font-size: 0.92rem; }
+        .price-list li:last-child { border-bottom: none; }
+        .price-list .ck { color: var(--green); font-weight: 700; font-size: 1rem; }
+
+        /* ===== CTA STRIP ===== */
+        .cta-strip {
+            background: var(--accent); background-size: 200% 200%;
+            animation: gradientShift 6s ease infinite; padding: 72px 0; text-align: center;
+        }
+        .cta-strip .sect-title { color: #fff; margin-bottom: 12px; }
+        .cta-strip .sect-text { color: rgba(255,255,255,0.85); margin: 0 auto 32px; }
+
+        /* ===== FORM ===== */
+        .form-wrap {
+            max-width: 580px; margin: 56px auto 0; background: var(--bg-card);
+            border: 1px solid var(--border); border-radius: 16px; padding: 48px;
+        }
+        .form-grp { margin-bottom: 20px; }
+        .form-grp label { display: block; font-size: 0.82rem; font-weight: 600; color: var(--text-secondary); margin-bottom: 8px; }
+        .form-grp input, .form-grp textarea {
+            width: 100%; padding: 14px 16px; background: rgba(255,255,255,0.03);
+            border: 1px solid var(--border); border-radius: 8px; font-size: 0.95rem;
+            color: var(--white); transition: all 0.3s;
+        }
+        .form-grp input::placeholder, .form-grp textarea::placeholder { color: var(--text-muted); }
+        .form-grp input:focus, .form-grp textarea:focus { border-color: var(--accent); background: rgba(155,27,48,0.03); box-shadow: 0 0 0 3px rgba(155,27,48,0.08); }
+        .form-grp textarea { resize: vertical; min-height: 90px; }
+        .form-note { font-size: 0.75rem; color: var(--text-muted); text-align: center; margin-top: 16px; }
+
+        /* ===== FOOTER ===== */
+        footer { background: var(--bg-alt); border-top: 1px solid var(--border); padding: 56px 0 32px; }
+        .foot-grid { display: grid; grid-template-columns: 2fr 1fr 1fr 1fr; gap: 40px; margin-bottom: 40px; }
+        .foot-brand p { color: var(--text-muted); font-size: 0.88rem; margin-top: 12px; max-width: 300px; line-height: 1.6; }
+        .foot-col h4 { font-family: var(--heading-font); font-size: 0.8rem; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; color: var(--text-secondary); margin-bottom: 16px; }
+        .foot-col a { display: block; color: var(--text-muted); font-size: 0.88rem; padding: 4px 0; transition: color 0.3s; }
+        .foot-col a:hover { color: var(--white); }
+        .foot-soc { display: flex; gap: 10px; margin-top: 16px; }
+        .foot-soc a {
+            width: 40px; height: 40px; background: rgba(255,255,255,0.04);
+            border: 1px solid var(--border); border-radius: 8px;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 1rem; transition: all 0.3s; padding: 0;
+        }
+        .foot-soc a:hover { background: var(--accent); border-color: var(--accent); }
+        .foot-bottom {
+            border-top: 1px solid var(--border); padding-top: 24px;
+            display: flex; justify-content: space-between; align-items: center;
+            font-size: 0.8rem; color: var(--text-muted);
+        }
+        .foot-bottom a { color: var(--text-muted); transition: color 0.3s; }
+        .foot-bottom a:hover { color: var(--white); }
+
+        /* ===== TOAST ===== */
+        .toast {
+            position: fixed; bottom: 30px; right: 30px; background: var(--green);
+            color: #fff; padding: 16px 24px; border-radius: 10px; font-weight: 600;
+            font-size: 0.88rem; box-shadow: 0 8px 30px var(--green-glow);
+            transform: translateY(120%); transition: transform 0.4s; z-index: 9999;
+        }
+        .toast.show { transform: translateY(0); }
+
+        /* ===== RESPONSIVE ===== */
+        @media (max-width: 1024px) {
+            .hero .container { grid-template-columns: 1fr; text-align: center; gap: 48px; }
+            .hero-desc ul { display: inline-block; text-align: left; }
+            .hero-btns { justify-content: center; }
+            .hero-stats { justify-content: center; }
+            .feat-grid { grid-template-columns: repeat(2, 1fr); }
+            .whom-grid { grid-template-columns: repeat(2, 1fr); }
+            .ben-grid { grid-template-columns: repeat(2, 1fr); }
+            .steps { grid-template-columns: repeat(2, 1fr); gap: 24px; }
+            .steps::before { display: none; }
+            .foot-grid { grid-template-columns: 1fr 1fr; }
+        }
+        @media (max-width: 768px) {
+            section { padding: 80px 0; }
+            .nav-links { display: none; }
+            .nav-links.active {
+                display: flex; flex-direction: column; position: absolute;
+                top: 100%; left: 0; right: 0; background: rgba(0,0,0,0.98);
+                backdrop-filter: blur(20px); padding: 24px; gap: 16px;
+                border-bottom: 1px solid var(--border);
+            }
+            .mobile-btn { display: block; }
+            .hero { padding: 110px 0 60px; min-height: auto; }
+            .hero h1 { font-size: 2rem; }
+            .hero-stats { gap: 24px; flex-wrap: wrap; }
+            .hero-stats .val { font-size: 1.4rem; }
+            .phone { width: 250px; }
+            .feat-grid, .whom-grid, .ben-grid, .steps { grid-template-columns: 1fr; }
+            .probs-grid { grid-template-columns: 1fr; }
+            .price-card { padding: 32px 20px; }
+            .form-wrap { padding: 32px 20px; }
+            .foot-grid { grid-template-columns: 1fr; gap: 32px; }
+            .foot-bottom { flex-direction: column; gap: 8px; text-align: center; }
+        }
+        @media (max-width: 480px) {
+            .container { padding: 0 16px; }
+            .hero-btns { flex-direction: column; }
+            .hero-btns .btn { width: 100%; }
+            .btn-lg { padding: 16px 24px; font-size: 0.95rem; }
+        }
+    </style>
+</head>
+<body>
+
+<!-- NAVBAR -->
+<nav class="navbar" id="navbar">
+    <div class="container">
+        <a href="#" class="logo">
+            <div class="logo-icon">⚡</div>
+            Mbot
+        </a>
+        <ul class="nav-links" id="navLinks">
+            <li><a href="#features">Возможности</a></li>
+            <li><a href="#how">Как работает</a></li>
+            <li><a href="#pricing">Цена</a></li>
+            <li><a href="#form" class="btn btn-accent" style="padding:10px 20px;">Получить демо</a></li>
+        </ul>
+        <button class="mobile-btn" onclick="document.getElementById('navLinks').classList.toggle('active')">
+            <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
+        </button>
+    </div>
+</nav>
+
+<!-- HERO -->
+<section class="hero">
+    <div class="container">
+        <div>
+            <div class="hero-badge"><span class="dot"></span> Автоматизация бизнеса через Telegram</div>
+            <h1>Снижайте неявки и&nbsp;возвращайте клиентов <em>автоматически</em></h1>
+            <div class="hero-desc">
+                Бот для бизнеса, который работает за вашего администратора:
+                <ul>
+                    <li>Напоминает клиентам о&nbsp;записи</li>
+                    <li>Помогает возвращать клиентов</li>
+                    <li>Собирает отзывы автоматически</li>
+                    <li>Снижает нагрузку на&nbsp;персонал</li>
+                </ul>
+            </div>
+            <div class="hero-btns">
+                <a href="#form" class="btn btn-accent btn-lg">Получить демо</a>
+                <a href="#how" class="btn btn-outline btn-lg">Как это работает</a>
+            </div>
+            <div class="hero-stats">
+                <div><div class="val">−40%</div><div class="label">Снижение неявок</div></div>
+                <div><div class="val">×2.5</div><div class="label">Больше отзывов</div></div>
+                <div><div class="val">24/7</div><div class="label">Работает за вас</div></div>
+            </div>
+        </div>
+        <div class="hero-visual">
+            <div class="phone">
+                <div class="phone-notch"></div>
+                <div class="phone-screen">
+                    <div class="ch-hdr">
+                        <div class="ch-av">✂️</div>
+                        <div class="ch-nm">Барбершоп Премиум</div>
+                        <div class="ch-st">онлайн</div>
+                    </div>
+                    <div class="ch-m">👋 Здравствуйте, Алексей!<br>Выберите действие:</div>
+                    <div class="ch-br"><div class="ch-b">📝 Записаться</div><div class="ch-b o">📋 Мои записи</div></div>
+                    <div class="ch-m u">Хочу записаться на стрижку</div>
+                    <div class="ch-m">✅ Отлично! Выберите дату:<br><b>📅 25 мая, 14:00</b></div>
+                    <div class="ch-m">⏰ <b>Через 2 часа — ваша запись!</b><br>💈 Стрижка · 🕐 14:00<br>📍 ул. Ленина, 42</div>
+                    <div class="ch-m u">⭐⭐⭐⭐⭐<br>Отличная стрижка!</div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- PROBLEMS -->
+<section class="sect-dark" id="problems">
+    <div class="container">
+        <div class="probs-grid anim">
+            <div>
+                <div class="sect-label">💥 Проблема</div>
+                <h2 class="sect-title hashtag">Сколько денег бизнес теряет из-за забытых записей</h2>
+                <p class="sect-text" style="margin-bottom:32px;">Многие бизнесы теряют клиентов каждый день из-за простых вещей, которые можно автоматизировать.</p>
+                <div class="prob-card">
+                    <div class="prob-icon">😔</div>
+                    <div><div class="prob-title">Неявки клиентов</div><div class="prob-desc">Клиент забыл про запись — вы потеряли деньги и время мастера</div></div>
+                </div>
+                <div class="prob-card">
+                    <div class="prob-icon">📵</div>
+                    <div><div class="prob-title">Нет напоминаний</div><div class="prob-desc">Никто не напоминает клиенту о визите — он просто не приходит</div></div>
+                </div>
+                <div class="prob-card">
+                    <div class="prob-icon">🔁</div>
+                    <div><div class="prob-title">Клиенты не возвращаются</div><div class="prob-desc">После первого визита клиент забывает о вас навсегда</div></div>
+                </div>
+                <div class="prob-card">
+                    <div class="prob-icon">😡</div>
+                    <div><div class="prob-title">Негатив не перехватывается</div><div class="prob-desc">Недовольный клиент уходит молча и оставляет плохой отзыв</div></div>
+                </div>
+            </div>
+            <div>
+                <div class="loss-box">
+                    <div class="loss-lbl">Средние потери бизнеса</div>
+                    <div class="loss-val">45 000 ₽</div>
+                    <div class="loss-per">в месяц только на неявках</div>
+                    <p style="color:var(--text-muted);font-size:0.85rem;margin-top:16px;">Салон с 20 клиентами в неделю теряет<br>до <b style="color:var(--red)">540 000 ₽ в год</b></p>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- FEATURES -->
+<section id="features">
+    <div class="container">
+        <div class="text-c anim">
+            <div class="sect-label" style="margin:0 auto 20px;">⚡ Возможности</div>
+            <h2 class="sect-title hashtag">Что умеет бот</h2>
+            <p class="sect-text center">Всё, что нужно бизнесу для автоматизации общения с клиентами</p>
+        </div>
+        <div class="feat-grid">
+            <div class="feat-card anim"><div class="feat-icon">📝</div><div class="feat-title">Онлайн-запись</div><div class="feat-desc">Клиент записывается через Telegram — без звонков, без ожидания. Выбор услуги, даты и времени за 30 секунд.</div></div>
+            <div class="feat-card anim"><div class="feat-icon">🔔</div><div class="feat-title">Напоминания</div><div class="feat-desc">Автоматические уведомления за день и за 2 часа до записи с адресом. Клиент не забудет про визит.</div></div>
+            <div class="feat-card anim"><div class="feat-icon">🔁</div><div class="feat-title">Повторные записи</div><div class="feat-desc">Бот напоминает клиенту, что пора вернуться. Увеличивает частоту визитов на 30%.</div></div>
+            <div class="feat-card anim"><div class="feat-icon">⭐</div><div class="feat-title">Сбор отзывов</div><div class="feat-desc">Автоматически просит клиента оставить отзыв через 2-3 часа после посещения. Рейтинг от 1 до 5 звёзд.</div></div>
+            <div class="feat-card anim"><div class="feat-icon">🛡️</div><div class="feat-title">Перехват негатива</div><div class="feat-desc">Если клиент поставил низкую оценку — админ получает уведомление мгновенно и может связаться с клиентом.</div></div>
+            <div class="feat-card anim"><div class="feat-icon">⚙️</div><div class="feat-title">Управление записями</div><div class="feat-desc">Администратор подтверждает, переносит, отменяет записи. Полный контроль через удобную админ-панель.</div></div>
+        </div>
+    </div>
+</section>
+
+<!-- SCREENSHOTS -->
+<section class="sect-dark" id="screenshots">
+    <div class="container">
+        <div class="text-c anim">
+            <div class="sect-label" style="margin:0 auto 20px;">📱 Интерфейс</div>
+            <h2 class="sect-title hashtag">Как это выглядит</h2>
+            <p class="sect-text center">Простой и понятный интерфейс в привычном Telegram</p>
+        </div>
+        <div class="shots-slider">
+            <div class="shot-card">
+                <div class="shot-label">Меню бота</div>
+                <div class="shot-phone">
+                    <div class="shot-m">👋 Здравствуйте, Алексей!<br><br>Добро пожаловать!<br><br>Выберите действие:</div>
+                    <div class="shot-btns"><div class="shot-b">📝 Записаться</div><div class="shot-b o">📋 Мои записи</div></div>
+                    <div class="shot-btns"><div class="shot-b o">⭐ Отзыв</div><div class="shot-b o">💬 Поддержка</div></div>
+                    <div class="shot-btns"><div class="shot-b o">📍 О нас</div><div class="shot-b o">📞 Контакты</div></div>
+                </div>
+                <div class="shot-bottom">Главное меню</div>
+            </div>
+            <div class="shot-card">
+                <div class="shot-label">Запись</div>
+                <div class="shot-phone">
+                    <div class="shot-m">📝 <b>Запись на приём</b><br><br>Выберите услугу:</div>
+                    <div class="shot-btns"><div class="shot-b">✂️ Стрижка — 1500₽</div></div>
+                    <div class="shot-btns"><div class="shot-b">💈 Бритьё — 800₽</div></div>
+                    <div class="shot-m" style="margin-top:8px;">📅 Выберите время:</div>
+                    <div class="shot-btns"><div class="shot-b">10:00</div><div class="shot-b">11:30</div><div class="shot-b">14:00</div></div>
+                </div>
+                <div class="shot-bottom">Процесс записи</div>
+            </div>
+            <div class="shot-card">
+                <div class="shot-label">Напоминание</div>
+                <div class="shot-phone">
+                    <div class="shot-m">🔔 <b>Напоминание</b><br><br>Завтра у вас запись!<br><br>💈 Услуга: Стрижка<br>📅 25 мая 2026<br>🕐 14:00<br>📍 ул. Ленина, 42<br><br>До встречи! 😊</div>
+                    <div class="shot-m" style="margin-top:8px;">⏰ <b>Через 2 часа — ваша запись!</b><br><br>💈 Стрижка<br>🕐 14:00<br>📍 ул. Ленина, 42<br><br>Если не можете прийти — отменьте.</div>
+                </div>
+                <div class="shot-bottom">Уведомления клиенту</div>
+            </div>
+            <div class="shot-card">
+                <div class="shot-label">Отзыв</div>
+                <div class="shot-phone">
+                    <div class="shot-m">👋 Здравствуйте!<br><br>Недавно вы были у нас (Стрижка).<br>Как всё прошло?<br>Будем признательны за отзыв! ⭐</div>
+                    <div class="shot-btns"><div class="shot-b">⭐ Оставить отзыв</div><div class="shot-b o">Пропустить</div></div>
+                    <div class="shot-m r" style="margin-top:10px;">⭐⭐⭐⭐⭐<br>Отличный мастер, рекомендую!</div>
+                </div>
+                <div class="shot-bottom">Сбор отзывов</div>
+            </div>
+            <div class="shot-card">
+                <div class="shot-label">Админ-панель</div>
+                <div class="shot-phone">
+                    <div class="shot-m">🔧 <b>Админ-панель</b><br><br>Бизнес: Барбершоп Премиум<br>Админ: 123456789</div>
+                    <div class="shot-btns"><div class="shot-b">📊 Статистика</div><div class="shot-b">📅 Записи</div></div>
+                    <div class="shot-btns"><div class="shot-b">👥 Клиенты</div><div class="shot-b">⭐ Отзывы</div></div>
+                    <div class="shot-btns"><div class="shot-b">📢 Рассылка</div><div class="shot-b">⚙️ Услуги</div></div>
+                </div>
+                <div class="shot-bottom">Управление</div>
+            </div>
+            <div class="shot-card">
+                <div class="shot-label">Статистика</div>
+                <div class="shot-phone">
+                    <div class="shot-m">📊 <b>Статистика</b><br><br>👥 Клиентов: 156<br>📅 Записей: 423<br>✅ Выполнено: 380<br>❌ Отменено: 23<br>👤 Неявки: 20<br><br>📈 Конверсия: <b>89.8%</b><br>⭐ Средний рейтинг: <b>4.7</b><br>💰 Доход: <b>625 000 ₽</b></div>
+                </div>
+                <div class="shot-bottom">Аналитика</div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- FOR WHOM -->
+<section id="whom">
+    <div class="container">
+        <div class="text-c anim">
+            <div class="sect-label" style="margin:0 auto 20px;">🏢 Аудитория</div>
+            <h2 class="sect-title hashtag">Для кого подходит</h2>
+            <p class="sect-text center">Любой бизнес, который принимает записи от клиентов</p>
+        </div>
+        <div class="whom-grid">
+            <div class="whom-card anim"><div class="whom-icon">💈</div><div><div class="whom-name">Барбершопы</div><div class="whom-desc">Стрижки, бритьё, укладки</div></div></div>
+            <div class="whom-card anim"><div class="whom-icon">💇‍♀️</div><div><div class="whom-name">Салоны красоты</div><div class="whom-desc">Маникюр, окрашивание, укладки</div></div></div>
+            <div class="whom-card anim"><div class="whom-icon">🦷</div><div><div class="whom-name">Стоматологии</div><div class="whom-desc">Приёмы, консультации, лечение</div></div></div>
+            <div class="whom-card anim"><div class="whom-icon">🏋️</div><div><div class="whom-name">Фитнес-клубы</div><div class="whom-desc">Тренировки, абонементы</div></div></div>
+            <div class="whom-card anim"><div class="whom-icon">💆‍♀️</div><div><div class="whom-name">Косметологии</div><div class="whom-desc">Процедуры, массаж, уход</div></div></div>
+            <div class="whom-card anim"><div class="whom-icon">🔧</div><div><div class="whom-name">Автосервисы</div><div class="whom-desc">ТО, ремонт, диагностика</div></div></div>
+        </div>
+    </div>
+</section>
+
+<!-- BENEFITS -->
+<section class="sect-dark">
+    <div class="container">
+        <div class="text-c anim">
+            <div class="sect-label" style="margin:0 auto 20px;">📈 Результат</div>
+            <h2 class="sect-title hashtag">Больше клиентов. Меньше потерь. Меньше нагрузки на администратора</h2>
+        </div>
+        <div class="ben-grid">
+            <div class="ben-card anim"><div class="ben-check">✓</div><div class="ben-title">Снижение неявок</div><div class="ben-desc">Автоматические напоминания уменьшают неявки на 40%</div></div>
+            <div class="ben-card anim"><div class="ben-check">✓</div><div class="ben-title">Возврат клиентов</div><div class="ben-desc">Бот напоминает, что пора записаться снова</div></div>
+            <div class="ben-card anim"><div class="ben-check">✓</div><div class="ben-title">Автоматизация</div><div class="ben-desc">Бот работает 24/7, освобождая администратора</div></div>
+            <div class="ben-card anim"><div class="ben-check">✓</div><div class="ben-title">Улучшение сервиса</div><div class="ben-desc">Клиенты ценят удобство записи через Telegram</div></div>
+            <div class="ben-card anim"><div class="ben-check">✓</div><div class="ben-title">Сбор отзывов</div><div class="ben-desc">В 3 раза больше отзывов благодаря автозапросу</div></div>
+            <div class="ben-card anim"><div class="ben-check">✓</div><div class="ben-title">Удержание негатива</div><div class="ben-desc">Мгновенное уведомление админа о проблеме</div></div>
+        </div>
+    </div>
+</section>
+
+<!-- CTA STRIP -->
+<div class="cta-strip">
+    <div class="container">
+        <h2 class="sect-title" style="font-size:clamp(1.5rem,3.5vw,2.2rem);">Готовы перестать терять клиентов?</h2>
+        <p class="sect-text center">Оставьте заявку — покажем демо за 10 минут</p>
+        <a href="#form" class="btn btn-white btn-lg">Получить бесплатное демо →</a>
+    </div>
+</div>
+
+<!-- STEPS -->
+<section id="how">
+    <div class="container">
+        <div class="text-c anim">
+            <div class="sect-label" style="margin:0 auto 20px;">🚀 Подключение</div>
+            <h2 class="sect-title hashtag">Как происходит подключение</h2>
+            <p class="sect-text center">4 простых шага — и бот уже работает на ваш бизнес</p>
+        </div>
+        <div class="steps">
+            <div class="step anim"><div class="step-num">01</div><div class="step-title">Оставляете заявку</div><div class="step-desc">Заполняете форму на сайте или пишете нам</div></div>
+            <div class="step anim"><div class="step-num">02</div><div class="step-title">Показываем демо</div><div class="step-desc">Демонстрируем работу бота за 10 минут</div></div>
+            <div class="step anim"><div class="step-num">03</div><div class="step-title">Настраиваем</div><div class="step-desc">Адаптируем бота под ваш бизнес и услуги</div></div>
+            <div class="step anim"><div class="step-num">04</div><div class="step-title">Запускаем!</div><div class="step-desc">Бот начинает работать — вы принимаете записи</div></div>
+        </div>
+    </div>
+</section>
+
+<!-- VIDEO -->
+<section class="sect-dark">
+    <div class="container">
+        <div class="text-c anim">
+            <div class="sect-label" style="margin:0 auto 20px;">🎬 Видео</div>
+            <h2 class="sect-title hashtag">Посмотрите как работает бот</h2>
+            <p class="sect-text center">30 секунд — и вы всё поймёте</p>
+        </div>
+        <div class="video-wrap anim">
+            <div style="text-align:center;padding:40px;">
+                <div class="video-play"><svg viewBox="0 0 24 24" fill="#fff"><polygon points="5,3 19,12 5,21"/></svg></div>
+                <p style="margin-top:16px;font-size:0.88rem;color:var(--text-muted);">Нажмите для просмотра видео (30 сек)</p>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- PRICING -->
+<section id="pricing">
+    <div class="container">
+        <div class="text-c anim">
+            <div class="sect-label" style="margin:0 auto 20px;">💰 Цена</div>
+            <h2 class="sect-title hashtag">Простая подписка без сложных тарифов</h2>
+        </div>
+        <div class="price-card anim">
+            <div class="price-tag">Популярный выбор</div>
+            <div class="price-val">5 000 <span>₽/мес</span></div>
+            <div class="price-per">Оплата за месяц использования • Без скрытых платежей</div>
+            <ul class="price-list">
+                <li><span class="ck">✓</span> Настройка под ваш бизнес</li>
+                <li><span class="ck">✓</span> Онлайн-запись через Telegram</li>
+                <li><span class="ck">✓</span> Автоматические напоминания</li>
+                <li><span class="ck">✓</span> Сбор отзывов и рейтингов</li>
+                <li><span class="ck">✓</span> Админ-панель с статистикой</li>
+                <li><span class="ck">✓</span> Техподдержка 24/7</li>
+                <li><span class="ck">✓</span> Обновления и новые функции</li>
+                <li><span class="ck">✓</span> Рассылка клиентам</li>
+            </ul>
+            <a href="#form" class="btn btn-accent btn-lg" style="width:100%;">Начать пользоваться →</a>
+        </div>
+    </div>
+</section>
+
+<!-- FORM -->
+<section class="sect-dark" id="form">
+    <div class="container">
+        <div class="text-c anim">
+            <div class="sect-label" style="margin:0 auto 20px;">📝 Заявка</div>
+            <h2 class="sect-title hashtag">Получите бесплатное демо</h2>
+            <p class="sect-text center">Оставьте контакты — свяжемся в течение 30 минут</p>
+        </div>
+        <div class="form-wrap anim">
+            <form id="demoForm" onsubmit="handleSubmit(event)">
+                <div class="form-grp"><label>Ваше имя</label><input type="text" id="name" placeholder="Иван Петров" required></div>
+                <div class="form-grp"><label>Телефон</label><input type="tel" id="phone" placeholder="+7 (999) 123-45-67" required></div>
+                <div class="form-grp"><label>Telegram или WhatsApp</label><input type="text" id="tg" placeholder="@username или номер"></div>
+                <div class="form-grp"><label>Название бизнеса</label><input type="text" id="biz" placeholder="Барбершоп «Премиум»"></div>
+                <div class="form-grp"><label>Комментарий (необязательно)</label><textarea id="comment" placeholder="Расскажите о вашем бизнесе..."></textarea></div>
+                <button type="submit" class="btn btn-accent btn-lg" style="width:100%;">Получить демо →</button>
+                <p class="form-note">Нажимая кнопку, вы соглашаетесь с <a href="#" style="color:var(--accent);">политикой конфиденциальности</a></p>
+            </form>
+        </div>
+    </div>
+</section>
+
+<!-- FOOTER -->
+<footer>
+    <div class="container">
+        <div class="foot-grid">
+            <div class="foot-brand">
+                <div class="logo" style="margin-bottom:4px;"><div class="logo-icon" style="width:28px;height:28px;font-size:0.9rem;">⚡</div> Mbot</div>
+                <p>Помогаем бизнесу не терять клиентов и автоматически возвращать их обратно.</p>
+                <div class="foot-soc"><a href="#" title="Telegram">✈️</a><a href="#" title="WhatsApp">💬</a><a href="#" title="VK">🅱️</a></div>
+            </div>
+            <div class="foot-col"><h4>Навигация</h4><a href="#features">Возможности</a><a href="#screenshots">Интерфейс</a><a href="#how">Как работает</a><a href="#pricing">Цена</a></div>
+            <div class="foot-col"><h4>Для кого</h4><a href="#whom">Барбершопы</a><a href="#whom">Салоны красоты</a><a href="#whom">Стоматологии</a><a href="#whom">Автосервисы</a></div>
+            <div class="foot-col"><h4>Контакты</h4><a href="tel:+79991234567">+7 (999) 123-45-67</a><a href="mailto:info@bizbot.ru">info@bizbot.ru</a><a href="#">Telegram: @bizbot_support</a></div>
+        </div>
+        <div class="foot-bottom"><span>© 2026 Mbot. Все права защищены.</span><a href="#">Политика конфиденциальности</a></div>
+    </div>
+</footer>
+
+<div class="toast" id="toast">✅ Заявка отправлена! Мы свяжемся с вами в ближайшее время.</div>
+
+<script>
+// Navbar scroll
+window.addEventListener('scroll', () => {
+    document.getElementById('navbar').classList.toggle('scrolled', window.scrollY > 50);
+});
+
+// Scroll animations
+const obs = new IntersectionObserver((entries) => {
+    entries.forEach((e, i) => {
+        if (e.isIntersecting) {
+            setTimeout(() => e.target.classList.add('visible'), i * 60);
+            obs.unobserve(e.target);
+        }
+    });
+}, { threshold: 0.1, rootMargin: '0px 0px -30px 0px' });
+document.querySelectorAll('.anim').forEach(el => obs.observe(el));
+
+// Отправка заявки — токен спрятан на сервере!
+async function handleSubmit(e) {
+    e.preventDefault();
+    const form = e.target;
+    const now = new Date().toLocaleString('ru-RU', { timeZone: 'Europe/Moscow' });
+
+    const payload = {
+        name: document.getElementById('name').value,
+        phone: document.getElementById('phone').value,
+        tg: document.getElementById('tg').value,
+        biz: document.getElementById('biz').value,
+        comment: document.getElementById('comment').value,
+        time: now
+    };
+
+    try {
+        await fetch('/api/send', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(payload)
+        });
+    } catch (err) {
+        console.error('Ошибка:', err);
+    }
+
+    document.getElementById('toast').classList.add('show');
+    setTimeout(() => document.getElementById('toast').classList.remove('show'), 4000);
+    form.reset();
+}
+
+// Smooth scroll
+document.querySelectorAll('a[href^="#"]').forEach(a => {
+    a.addEventListener('click', function(e) {
+        e.preventDefault();
+        const t = document.querySelector(this.getAttribute('href'));
+        if (t) {
+            t.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            document.getElementById('navLinks').classList.remove('active');
+        }
+    });
+});
+
+// Phone mask
+const pi = document.getElementById('phone');
+if (pi) {
+    pi.addEventListener('input', function() {
+        let v = this.value.replace(/\D/g, '');
+        if (v.length > 0) {
+            if (v[0] === '7' || v[0] === '8') v = v.substring(1);
+            let f = '+7';
+            if (v.length > 0) f += ' (' + v.substring(0, 3);
+            if (v.length >= 3) f += ') ' + v.substring(3, 6);
+            if (v.length >= 6) f += '-' + v.substring(6, 8);
+            if (v.length >= 8) f += '-' + v.substring(8, 10);
+            this.value = f;
+        }
+    });
+}
+</script>
+</body>
+</html>
