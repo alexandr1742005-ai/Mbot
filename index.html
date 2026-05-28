@@ -295,19 +295,39 @@
         .step-title { font-family: var(--heading-font); font-weight: 700; font-size: 0.95rem; margin-bottom: 6px; }
         .step-desc { font-size: 0.82rem; color: var(--text-muted); }
 
-        /* ===== VIDEO ===== */
-        .video-wrap {
-            max-width: 800px; margin: 56px auto 0; border-radius: 12px; overflow: hidden;
-            border: 1px solid var(--border); background: var(--bg-card); aspect-ratio: 16/9;
-            display: flex; align-items: center; justify-content: center;
+        /* ===== FAQ ===== */
+        .faq-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 20px; margin-top: 56px; }
+        .faq-card {
+            background: var(--bg-card); border: 1px solid var(--border); border-radius: 12px;
+            padding: 0; overflow: hidden; transition: all 0.3s; cursor: pointer;
         }
-        .video-play {
-            width: 80px; height: 80px; background: var(--accent); border-radius: 50%;
-            display: flex; align-items: center; justify-content: center;
-            cursor: pointer; transition: all 0.3s; box-shadow: 0 8px 40px var(--accent-glow);
+        .faq-card:hover { border-color: rgba(155,27,48,0.2); background: var(--bg-card-hover); }
+        .faq-header {
+            display: flex; align-items: center; justify-content: space-between;
+            padding: 24px; gap: 16px; user-select: none;
         }
-        .video-play:hover { transform: scale(1.1); }
-        .video-play svg { width: 28px; height: 28px; margin-left: 4px; }
+        .faq-title {
+            font-family: var(--heading-font); font-weight: 700; font-size: 0.95rem;
+            line-height: 1.4; margin: 0; color: var(--text-primary);
+        }
+        .faq-toggle {
+            width: 32px; height: 32px; min-width: 32px; background: rgba(155,27,48,0.08);
+            border-radius: 8px; display: flex; align-items: center; justify-content: center;
+            font-weight: 700; color: var(--accent); font-size: 1.2rem;
+            transition: all 0.3s;
+        }
+        .faq-card.open .faq-toggle {
+            background: var(--accent); color: #fff; transform: rotate(45deg);
+        }
+        .faq-content {
+            max-height: 0; overflow: hidden; transition: max-height 0.3s ease;
+            padding: 0 24px; color: var(--text-secondary); font-size: 0.9rem; line-height: 1.6;
+        }
+        .faq-card.open .faq-content {
+            max-height: 600px; padding: 0 24px 24px 24px;
+        }
+        .faq-content p { margin-bottom: 8px; }
+        .faq-content ul li { margin: 6px 0; }
 
         /* ===== PRICING ===== */
         .price-card {
@@ -393,6 +413,7 @@
             .ben-grid { grid-template-columns: repeat(2, 1fr); }
             .steps { grid-template-columns: repeat(2, 1fr); gap: 24px; }
             .steps::before { display: none; }
+            .faq-grid { grid-template-columns: 1fr; }
             .foot-grid { grid-template-columns: 1fr 1fr; }
         }
         @media (max-width: 768px) {
@@ -410,7 +431,7 @@
             .hero-stats { gap: 24px; flex-wrap: wrap; }
             .hero-stats .val { font-size: 1.4rem; }
             .phone { width: 250px; }
-            .feat-grid, .whom-grid, .ben-grid, .steps { grid-template-columns: 1fr; }
+            .feat-grid, .whom-grid, .ben-grid, .steps, .faq-grid { grid-template-columns: 1fr; }
             .probs-grid { grid-template-columns: 1fr; }
             .price-card { padding: 32px 20px; }
             .form-wrap { padding: 32px 20px; }
@@ -436,7 +457,7 @@
         </a>
         <ul class="nav-links" id="navLinks">
             <li><a href="#features">Возможности</a></li>
-            <li><a href="#how">Как работает</a></li>
+            <li><a href="#faq">Вопросы</a></li>
             <li><a href="#pricing">Цена</a></li>
             <li><a href="#form" class="btn btn-accent" style="padding:10px 20px;">Записаться</a></li>
         </ul>
@@ -679,18 +700,198 @@
     </div>
 </section>
 
-<!-- VIDEO -->
-<section class="sect-dark">
+<!-- FAQ -->
+<section class="sect-dark" id="faq">
     <div class="container">
         <div class="text-c anim">
-            <div class="sect-label" style="margin:0 auto 20px;">Видео</div>
-            <h2 class="sect-title hashtag">Посмотрите как работает бот</h2>
-            <p class="sect-text center">30 секунд — и вы всё поймёте</p>
+            <div class="sect-label" style="margin:0 auto 20px;">❓ Вопросы</div>
+            <h2 class="sect-title hashtag">Часто задаваемые вопросы</h2>
+            <p class="sect-text center">Ответы на самые важные вопросы о боте</p>
         </div>
-        <div class="video-wrap anim">
-            <div style="text-align:center;padding:40px;">
-                <div class="video-play"><svg viewBox="0 0 24 24" fill="#fff"><polygon points="5,3 19,12 5,21"/></svg></div>
-                <p style="margin-top:16px;font-size:0.88rem;color:var(--text-muted);">Нажмите для просмотра видео (30 сек)</p>
+        <div class="faq-grid">
+            <!-- FAQ Item 1 -->
+            <div class="faq-card anim" onclick="this.classList.toggle('open')">
+                <div class="faq-header">
+                    <h3 class="faq-title">📱 С какими мессенджерами работает бот?</h3>
+                    <div class="faq-toggle">+</div>
+                </div>
+                <div class="faq-content">
+                    <p>Бот работает в <strong>Telegram</strong> — это основная платформа. Telegram выбран потому, что:
+                    <ul style="margin-top:8px;margin-left:20px;color:var(--text-secondary);">
+                        <li style="margin:4px 0;">✓ 95% пользователей постоянно в Telegram</li>
+                        <li style="margin:4px 0;">✓ Простой и понятный интерфейс</li>
+                        <li style="margin:4px 0;">✓ Быстрые уведомления и напоминания</li>
+                        <li style="margin:4px 0;">✓ Удобные кнопки для выбора услуг</li>
+                    </ul>
+                    </p>
+                </div>
+            </div>
+
+            <!-- FAQ Item 2 -->
+            <div class="faq-card anim" onclick="this.classList.toggle('open')">
+                <div class="faq-header">
+                    <h3 class="faq-title">⏱️ Сколько времени занимает установка?</h3>
+                    <div class="faq-toggle">+</div>
+                </div>
+                <div class="faq-content">
+                    <p>Всё просто и быстро:
+                    <ul style="margin-top:8px;margin-left:20px;color:var(--text-secondary);">
+                        <li style="margin:4px 0;"><strong>День 1:</strong> Вы оставляете заявку</li>
+                        <li style="margin:4px 0;"><strong>День 1 (через 30 мин):</strong> Показываем демо</li>
+                        <li style="margin:4px 0;"><strong>День 2-3:</strong> Настраиваем бота под ваш бизнес</li>
+                        <li style="margin:4px 0;"><strong>День 3:</strong> Бот готов к работе!</li>
+                    </ul>
+                    Всё это займёт максимум 3 дня работы.</p>
+                </div>
+            </div>
+
+            <!-- FAQ Item 3 -->
+            <div class="faq-card anim" onclick="this.classList.toggle('open')">
+                <div class="faq-header">
+                    <h3 class="faq-title">💰 Какова стоимость? Есть ли скрытые платежи?</h3>
+                    <div class="faq-toggle">+</div>
+                </div>
+                <div class="faq-content">
+                    <p><strong style="color:var(--accent);">4 990 ₽ в месяц — полная стоимость!</strong></p>
+                    <p style="margin-top:8px;">Никаких скрытых платежей, комиссий или переплат. В стоимость входит:
+                    <ul style="margin-top:8px;margin-left:20px;color:var(--text-secondary);">
+                        <li style="margin:4px 0;">✓ Полная работа бота</li>
+                        <li style="margin:4px 0;">✓ Техническая поддержка</li>
+                        <li style="margin:4px 0;">✓ Все обновления и новые функции</li>
+                        <li style="margin:4px 0;">✓ Никаких переплат за кол-во клиентов</li>
+                    </ul>
+                    </p>
+                </div>
+            </div>
+
+            <!-- FAQ Item 4 -->
+            <div class="faq-card anim" onclick="this.classList.toggle('open')">
+                <div class="faq-header">
+                    <h3 class="faq-title">👥 Сколько клиентов сможет обслужить бот?</h3>
+                    <div class="faq-toggle">+</div>
+                </div>
+                <div class="faq-content">
+                    <p>Бот работает с <strong>неограниченным количеством клиентов</strong>. Неважно, у вас 50 клиентов в месяц или 500 — цена одна и та же.</p>
+                    <p style="margin-top:8px;color:var(--text-secondary);">За счёт автоматизации бот справляется с любыми объёмами записей, напоминаний и отзывов. Чем больше клиентов, тем выше ваша экономия!</p>
+                </div>
+            </div>
+
+            <!-- FAQ Item 5 -->
+            <div class="faq-card anim" onclick="this.classList.toggle('open')">
+                <div class="faq-header">
+                    <h3 class="faq-title">🔧 Какие услуги может добавить бот?</h3>
+                    <div class="faq-toggle">+</div>
+                </div>
+                <div class="faq-content">
+                    <p>Бот работает с <strong>любыми услугами</strong>. Примеры:
+                    <ul style="margin-top:8px;margin-left:20px;color:var(--text-secondary);">
+                        <li style="margin:4px 0;"><strong>Барбершоп:</strong> стрижка, бритьё, укладка, кератин</li>
+                        <li style="margin:4px 0;"><strong>Салон:</strong> маникюр, педикюр, окрашивание, ламинирование</li>
+                        <li style="margin:4px 0;"><strong>Стоматология:</strong> чистка, лечение, имплантация, ортодонтия</li>
+                        <li style="margin:4px 0;"><strong>Фитнес:</strong> групповые занятия, персональные тренировки, консультации</li>
+                    </ul>
+                    </p>
+                    <p style="margin-top:8px;color:var(--text-secondary);">При подключении мы настраиваем все ваши услуги, цены и длительность.</p>
+                </div>
+            </div>
+
+            <!-- FAQ Item 6 -->
+            <div class="faq-card anim" onclick="this.classList.toggle('open')">
+                <div class="faq-header">
+                    <h3 class="faq-title">📊 Какие данные я смогу видеть в админ-панели?</h3>
+                    <div class="faq-toggle">+</div>
+                </div>
+                <div class="faq-content">
+                    <p>В админ-панели вы получаете полную информацию:
+                    <ul style="margin-top:8px;margin-left:20px;color:var(--text-secondary);">
+                        <li style="margin:4px 0;">📊 Количество новых клиентов</li>
+                        <li style="margin:4px 0;">📅 Все текущие и будущие записи</li>
+                        <li style="margin:4px 0;">✅ Выполненные записи и статистика</li>
+                        <li style="margin:4px 0;">❌ Отменённые записи и неявки</li>
+                        <li style="margin:4px 0;">⭐ Все отзывы и рейтинги</li>
+                        <li style="margin:4px 0;">💰 Сумма дохода от записей</li>
+                        <li style="margin:4px 0;">📈 Процент конверсии и средний чек</li>
+                    </ul>
+                    </p>
+                </div>
+            </div>
+
+            <!-- FAQ Item 7 -->
+            <div class="faq-card anim" onclick="this.classList.toggle('open')">
+                <div class="faq-header">
+                    <h3 class="faq-title">🔔 Как клиент включит уведомления от бота?</h3>
+                    <div class="faq-toggle">+</div>
+                </div>
+                <div class="faq-content">
+                    <p>Всё очень просто:
+                    <ul style="margin-top:8px;margin-left:20px;color:var(--text-secondary);">
+                        <li style="margin:4px 0;">1. Клиент находит вас в Telegram (по ссылке или кнопке на сайте)</li>
+                        <li style="margin:4px 0;">2. Нажимает «Запустить» или «Start»</li>
+                        <li style="margin:4px 0;">3. Telegram просит разрешение на уведомления</li>
+                        <li style="margin:4px 0;">4. Клиент разрешает — и всё готово!</li>
+                    </ul>
+                    </p>
+                    <p style="margin-top:8px;color:var(--text-secondary);">Telegram встроенный в телефоне, поэтому уведомления приходят надежно и быстро.</p>
+                </div>
+            </div>
+
+            <!-- FAQ Item 8 -->
+            <div class="faq-card anim" onclick="this.classList.toggle('open')">
+                <div class="faq-header">
+                    <h3 class="faq-title">🛡️ Безопасны ли данные клиентов?</h3>
+                    <div class="faq-toggle">+</div>
+                </div>
+                <div class="faq-content">
+                    <p>Да, безопасность — приоритет:
+                    <ul style="margin-top:8px;margin-left:20px;color:var(--text-secondary);">
+                        <li style="margin:4px 0;">🔐 Все данные шифруются</li>
+                        <li style="margin:4px 0;">🛡️ Защита от несанкционированного доступа</li>
+                        <li style="margin:4px 0;">📋 Соответствие требованиям о защите данных</li>
+                        <li style="margin:4px 0;">🌐 Резервные копии каждый день</li>
+                        <li style="margin:4px 0;">🚫 Данные используются только для работы бота</li>
+                    </ul>
+                    </p>
+                </div>
+            </div>
+
+            <!-- FAQ Item 9 -->
+            <div class="faq-card anim" onclick="this.classList.toggle('open')">
+                <div class="faq-header">
+                    <h3 class="faq-title">📞 Что если у нас возникнет проблема?</h3>
+                    <div class="faq-toggle">+</div>
+                </div>
+                <div class="faq-content">
+                    <p>Мы всегда рядом:
+                    <ul style="margin-top:8px;margin-left:20px;color:var(--text-secondary);">
+                        <li style="margin:4px 0;"><strong>⚡ Быстрый ответ:</strong> Ответим в течение 1 часа</li>
+                        <li style="margin:4px 0;"><strong>🎯 Решение:</strong> Большинство проблем решаем за 30 минут</li>
+                        <li style="margin:4px 0;"><strong>📱 Контакт:</strong> Telegram, WhatsApp, телефон</li>
+                        <li style="margin:4px 0;"><strong>📚 База:</strong> Подробная документация и видео-инструкции</li>
+                    </ul>
+                    </p>
+                    <p style="margin-top:8px;color:var(--accent);">Техподдержка 24/7 включена в стоимость подписки!</p>
+                </div>
+            </div>
+
+            <!-- FAQ Item 10 -->
+            <div class="faq-card anim" onclick="this.classList.toggle('open')">
+                <div class="faq-header">
+                    <h3 class="faq-title">🚀 Какие обновления и новые функции будут?</h3>
+                    <div class="faq-toggle">+</div>
+                </div>
+                <div class="faq-content">
+                    <p>Мы постоянно развиваем бот. В планах:
+                    <ul style="margin-top:8px;margin-left:20px;color:var(--text-secondary);">
+                        <li style="margin:4px 0;">📧 Интеграция с email для уведомлений</li>
+                        <li style="margin:4px 0;">💬 Сообщения в WhatsApp и SMS</li>
+                        <li style="margin:4px 0;">💳 Прямая оплата в боте</li>
+                        <li style="margin:4px 0;">🤖 Умная рассылка по поведению клиента</li>
+                        <li style="margin:4px 0;">📊 Расширенная аналитика и отчёты</li>
+                        <li style="margin:4px 0;">🔗 Интеграция с другими системами</li>
+                    </ul>
+                    </p>
+                    <p style="margin-top:8px;color:var(--accent);">Все обновления приходят бесплатно! Вы всегда получаете последнюю версию.</p>
+                </div>
             </div>
         </div>
     </div>
@@ -753,7 +954,7 @@
                 <p>Помогаем бизнесу не терять клиентов и автоматически возвращать их обратно.</p>
                 <div class="foot-soc"><a href="#" title="Telegram">✈️</a><a href="#" title="WhatsApp">💬</a><a href="#" title="VK">🅱️</a></div>
             </div>
-            <div class="foot-col"><h4>Навигация</h4><a href="#features">Возможности</a><a href="#screenshots">Интерфейс</a><a href="#how">Как работает</a><a href="#pricing">Цена</a></div>
+            <div class="foot-col"><h4>Навигация</h4><a href="#features">Возможности</a><a href="#screenshots">Интерфейс</a><a href="#faq">Вопросы</a><a href="#pricing">Цена</a></div>
             <div class="foot-col"><h4>Для кого</h4><a href="#whom">Барбершопы</a><a href="#whom">Салоны красоты</a><a href="#whom">Стоматологии</a><a href="#whom">Автосервисы</a></div>
             <div class="foot-col"><h4>Контакты</h4><a href="tel:+79320165127">+7 (932) 016-51-27</a><a href="mailto:info@bizbot.ru">karen.nazarov172006@gmail.com</a><a href="#">Telegram: @Karen_7717</a></div>
         </div>
