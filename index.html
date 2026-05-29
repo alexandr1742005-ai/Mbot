@@ -512,19 +512,19 @@
     <div class="container">
         <div>
             <div class="hero-badge"><span class="dot"></span> Автоматизация бизнеса через Telegram</div>
-            <h1>Снижайте неявки и&nbsp;возвращайте клиентов <em>автоматически</em></h1>
+            <h1>Снижайте неявки и возвращайте клиентов <em>автоматически</em></h1>
             <div class="hero-desc">
                 Бот для бизнеса, который работает за вашего администратора:
                 <ul>
-                    <li>Напоминает клиентам о&nbsp;записи</li>
+                    <li>Напоминает клиентам о записи</li>
                     <li>Помогает возвращать клиентов</li>
                     <li>Собирает отзывы автоматически</li>
-                    <li>Снижает нагрузку на&nbsp;персонал</li>
+                    <li>Снижает нагрузку на персонал</li>
                 </ul>
             </div>
             <div class="hero-btns">
                 <a href="#form" class="btn btn-accent btn-lg">Получить продукт</a>
-                <a href="#how" class="btn btn-outline btn-lg">Как это работает</a>
+                <a href="#how" class="btn btn-outline btn-lg">Ответы на вопросы</a>
             </div>
             <div class="hero-stats">
                 <div><div class="val">−40%</div><div class="label">Снижение неявок</div></div>
@@ -643,7 +643,7 @@
                 <div class="shot-label">Напоминание</div>
                 <div class="shot-phone">
                     <div class="shot-m">🔔 <b>Напоминание</b><br><br>Завтра у вас запись!<br><br>💈 Услуга: Стрижка<br>📅 25 мая 2026<br>🕐 14:00<br>📍 ул. Ленина, 42<br><br>До встречи! 😊</div>
-                    <div class="shot-m" style="margin-top:8px;">⏰ <b>Через 2 часа — ваша запись!</b><br><br>💈 Стрижка<br>🕐 14:00<br>📍 ул. Ленина, 42<br><br>Если не можете прийти — отменьте.</div>
+                    <div class="shot-m" style="margin-top:8px;">⏰ <b>Через 2 часа — ваша запись!</b><br><br>💈 Стрижка<br>🕐 14:00<br>📍 ул. Ленина, 42<br><br>Если не можете прийти — отмените.</div>
                 </div>
                 <div class="shot-bottom">Уведомления клиенту</div>
             </div>
@@ -964,7 +964,7 @@
 </section>
 
 <!-- РЕКВИЗИТЫ -->
-<section id="requisites">
+<section id="requisites" class="sect-dark">
     <div class="container">
         <div class="text-c anim">
             <div class="sect-label" style="margin:0 auto 20px;">💳 Платёж</div>
@@ -973,52 +973,43 @@
         </div>
         <div class="requisites-card anim">
             <div class="req-item">
-                <div class="req-label">Получатель</div>
+                <span class="req-label">ИП</span>
                 <div class="req-content">
-                    <span id="req-recipient">ИП Назаров Карен Меликович</span>
-                    <button class="req-copy" onclick="copyToClipboard('req-recipient', this)">📋</button>
+                    <span id="req-ip">Иванов Иван Иванович</span>
+                    <button class="req-copy" onclick="copyToClipboard('req-ip', this)" title="Копировать">📋</button>
                 </div>
             </div>
-
             <div class="req-item">
-                <div class="req-label">ИНН</div>
+                <span class="req-label">ИНН</span>
                 <div class="req-content">
-                    <span id="req-inn">744302319571</span>
-                    <button class="req-copy" onclick="copyToClipboard('req-inn', this)">📋</button>
+                    <span id="req-inn">123456789012</span>
+                    <button class="req-copy" onclick="copyToClipboard('req-inn', this)" title="Копировать">📋</button>
                 </div>
             </div>
-
             <div class="req-item">
-                <div class="req-label">Расчётный счёт</div>
+                <span class="req-label">БИК</span>
                 <div class="req-content">
-                    <span id="req-account">40802810820001013120</span>
-                    <button class="req-copy" onclick="copyToClipboard('req-account', this)">📋</button>
+                    <span id="req-bik">044525225</span>
+                    <button class="req-copy" onclick="copyToClipboard('req-bik', this)" title="Копировать">📋</button>
                 </div>
             </div>
-
             <div class="req-item">
-                <div class="req-label">Банк</div>
+                <span class="req-label">Расчётный счёт</span>
                 <div class="req-content">
-                    <span id="req-bank">ООО "Банк Точка"</span>
-                    <button class="req-copy" onclick="copyToClipboard('req-bank', this)">📋</button>
+                    <span id="req-account">40802810123456789012</span>
+                    <button class="req-copy" onclick="copyToClipboard('req-account', this)" title="Копировать">📋</button>
                 </div>
             </div>
-
             <div class="req-item">
-                <div class="req-label">БИК</div>
+                <span class="req-label">Банк</span>
                 <div class="req-content">
-                    <span id="req-bik">044525104</span>
-                    <button class="req-copy" onclick="copyToClipboard('req-bik', this)">📋</button>
+                    <span id="req-bank">ПАО «Сбербанк»</span>
+                    <button class="req-copy" onclick="copyToClipboard('req-bank', this)" title="Копировать">📋</button>
                 </div>
             </div>
-
-            <div class="req-item">
-                <div class="req-label">К/С (Корреспондентский счёт)</div>
-                <div class="req-content">
-                    <span id="req-ks">30101810745374525104</span>
-                    <button class="req-copy" onclick="copyToClipboard('req-ks', this)">📋</button>
-                </div>
-            </div>
+            <p style="text-align:center;color:var(--text-muted);font-size:0.85rem;margin-top:24px;">
+                После оплаты напишите нам в Telegram @Karen_7717 для активации доступа
+            </p>
         </div>
     </div>
 </section>
@@ -1056,9 +1047,23 @@
             </div>
             <div class="foot-col"><h4>Навигация</h4><a href="#features">Возможности</a><a href="#screenshots">Интерфейс</a><a href="#faq">Вопросы</a><a href="#pricing">Цена</a><a href="#requisites">Реквизиты</a></div>
             <div class="foot-col"><h4>Для кого</h4><a href="#whom">Барбершопы</a><a href="#whom">Салоны красоты</a><a href="#whom">Стоматологии</a><a href="#whom">Автосервисы</a></div>
-            <div class="foot-col"><h4>Контакты</h4><a href="tel:+79320165127">+7 (932) 016-51-27</a><a href="mailto:info@bizbot.ru">karen.nazarov172006@gmail.com</a><a href="#">Telegram: @Karen_7717</a></div>
+            <div class="foot-col">
+                <h4>Контакты</h4>
+                <a href="tel:+79320165127">+7 (932) 016-51-27</a>
+                <a href="mailto:karen.nazarov172006@gmail.com">karen.nazarov172006@gmail.com</a>
+                <a href="#">Telegram: @Karen_7717</a>
+                <div style="margin-top:16px;padding-top:16px;border-top:1px solid var(--border);font-size:0.8rem;color:var(--text-muted);">
+                    <div><strong>Реквизиты:</strong></div>
+                    <div>ИП: Назаров Карен Меликович</div>
+                    <div>ИНН: 744302319571</div>
+                    <div>БИК: 044525104</div>
+                </div>
+            </div>
         </div>
-        <div class="foot-bottom"><span>© 2026 Mbot. Все права защищены.</span><a href="#">Политика конфиденциальности</a></div>
+        <div class="foot-bottom">
+            <span>© 2026 Mbot. Все права защищены.</span>
+            <a href="#">Политика конфиденциальности</a>
+        </div>
     </div>
 </footer>
 
