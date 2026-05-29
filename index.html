@@ -345,6 +345,43 @@
         .price-list li:last-child { border-bottom: none; }
         .price-list .ck { color: var(--green); font-weight: 700; font-size: 1rem; }
 
+        /* ===== REQUISITES ===== */
+        .requisites-card {
+            max-width: 700px; margin: 56px auto 0; background: var(--bg-card);
+            border: 1px solid var(--border); border-radius: 16px; padding: 40px;
+        }
+        .req-item {
+            padding: 20px 0; border-bottom: 1px solid var(--border); display: flex;
+            justify-content: space-between; align-items: center; gap: 20px;
+        }
+        .req-item:last-child { border-bottom: none; }
+        .req-label {
+            font-family: var(--heading-font); font-weight: 700; font-size: 0.9rem;
+            color: var(--text-secondary); min-width: 150px; text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        .req-content {
+            display: flex; align-items: center; gap: 12px; flex: 1;
+            justify-content: flex-end;
+        }
+        .req-content span {
+            font-family: 'Courier New', monospace; font-weight: 600; font-size: 0.95rem;
+            color: var(--text-primary); word-break: break-all;
+        }
+        .req-copy {
+            background: rgba(155,27,48,0.08); border: 1px solid rgba(155,27,48,0.15);
+            color: var(--accent); width: 40px; height: 40px; border-radius: 8px;
+            display: flex; align-items: center; justify-content: center;
+            cursor: pointer; transition: all 0.3s; font-size: 1rem;
+            font-weight: 600; padding: 0;
+        }
+        .req-copy:hover {
+            background: var(--accent); color: #fff; border-color: var(--accent);
+        }
+        .req-copy.copied {
+            background: var(--green); color: #fff; border-color: var(--green);
+        }
+
         /* ===== CTA STRIP ===== */
         .cta-strip {
             background: var(--accent); background-size: 200% 200%;
@@ -434,6 +471,9 @@
             .feat-grid, .whom-grid, .ben-grid, .steps, .faq-grid { grid-template-columns: 1fr; }
             .probs-grid { grid-template-columns: 1fr; }
             .price-card { padding: 32px 20px; }
+            .requisites-card { padding: 24px; }
+            .req-item { flex-direction: column; align-items: flex-start; gap: 8px; }
+            .req-content { justify-content: flex-start; flex-direction: column; align-items: flex-start; }
             .form-wrap { padding: 32px 20px; }
             .foot-grid { grid-template-columns: 1fr; gap: 32px; }
             .foot-bottom { flex-direction: column; gap: 8px; text-align: center; }
@@ -708,9 +748,9 @@
             <h2 class="sect-title hashtag">Часто задаваемые вопросы</h2>
             <p class="sect-text center">Ответы на самые важные вопросы о боте</p>
         </div>
-        <div class="faq-grid">
+        <div class="faq-grid" id="faqGrid">
             <!-- FAQ Item 1 -->
-            <div class="faq-card anim" onclick="this.classList.toggle('open')">
+            <div class="faq-card anim" onclick="toggleFaq(this)">
                 <div class="faq-header">
                     <h3 class="faq-title">📱 С какими мессенджерами работает бот?</h3>
                     <div class="faq-toggle">+</div>
@@ -728,7 +768,7 @@
             </div>
 
             <!-- FAQ Item 2 -->
-            <div class="faq-card anim" onclick="this.classList.toggle('open')">
+            <div class="faq-card anim" onclick="toggleFaq(this)">
                 <div class="faq-header">
                     <h3 class="faq-title">⏱️ Сколько времени занимает установка?</h3>
                     <div class="faq-toggle">+</div>
@@ -746,7 +786,7 @@
             </div>
 
             <!-- FAQ Item 3 -->
-            <div class="faq-card anim" onclick="this.classList.toggle('open')">
+            <div class="faq-card anim" onclick="toggleFaq(this)">
                 <div class="faq-header">
                     <h3 class="faq-title">💰 Какова стоимость? Есть ли скрытые платежи?</h3>
                     <div class="faq-toggle">+</div>
@@ -765,7 +805,7 @@
             </div>
 
             <!-- FAQ Item 4 -->
-            <div class="faq-card anim" onclick="this.classList.toggle('open')">
+            <div class="faq-card anim" onclick="toggleFaq(this)">
                 <div class="faq-header">
                     <h3 class="faq-title">👥 Сколько клиентов сможет обслужить бот?</h3>
                     <div class="faq-toggle">+</div>
@@ -777,7 +817,7 @@
             </div>
 
             <!-- FAQ Item 5 -->
-            <div class="faq-card anim" onclick="this.classList.toggle('open')">
+            <div class="faq-card anim" onclick="toggleFaq(this)">
                 <div class="faq-header">
                     <h3 class="faq-title">🔧 Какие услуги может добавить бот?</h3>
                     <div class="faq-toggle">+</div>
@@ -796,7 +836,7 @@
             </div>
 
             <!-- FAQ Item 6 -->
-            <div class="faq-card anim" onclick="this.classList.toggle('open')">
+            <div class="faq-card anim" onclick="toggleFaq(this)">
                 <div class="faq-header">
                     <h3 class="faq-title">📊 Какие данные я смогу видеть в админ-панели?</h3>
                     <div class="faq-toggle">+</div>
@@ -817,7 +857,7 @@
             </div>
 
             <!-- FAQ Item 7 -->
-            <div class="faq-card anim" onclick="this.classList.toggle('open')">
+            <div class="faq-card anim" onclick="toggleFaq(this)">
                 <div class="faq-header">
                     <h3 class="faq-title">🔔 Как клиент включит уведомления от бота?</h3>
                     <div class="faq-toggle">+</div>
@@ -836,7 +876,7 @@
             </div>
 
             <!-- FAQ Item 8 -->
-            <div class="faq-card anim" onclick="this.classList.toggle('open')">
+            <div class="faq-card anim" onclick="toggleFaq(this)">
                 <div class="faq-header">
                     <h3 class="faq-title">🛡️ Безопасны ли данные клиентов?</h3>
                     <div class="faq-toggle">+</div>
@@ -855,7 +895,7 @@
             </div>
 
             <!-- FAQ Item 9 -->
-            <div class="faq-card anim" onclick="this.classList.toggle('open')">
+            <div class="faq-card anim" onclick="toggleFaq(this)">
                 <div class="faq-header">
                     <h3 class="faq-title">📞 Что если у нас возникнет проблема?</h3>
                     <div class="faq-toggle">+</div>
@@ -874,7 +914,7 @@
             </div>
 
             <!-- FAQ Item 10 -->
-            <div class="faq-card anim" onclick="this.classList.toggle('open')">
+            <div class="faq-card anim" onclick="toggleFaq(this)">
                 <div class="faq-header">
                     <h3 class="faq-title">🚀 Какие обновления и новые функции будут?</h3>
                     <div class="faq-toggle">+</div>
@@ -923,6 +963,66 @@
     </div>
 </section>
 
+<!-- РЕКВИЗИТЫ -->
+<section id="requisites">
+    <div class="container">
+        <div class="text-c anim">
+            <div class="sect-label" style="margin:0 auto 20px;">💳 Платёж</div>
+            <h2 class="sect-title hashtag">Реквизиты для оплаты</h2>
+            <p class="sect-text center">Если хотите оплатить напрямую на расчётный счёт</p>
+        </div>
+        <div class="requisites-card anim">
+            <div class="req-item">
+                <div class="req-label">Получатель</div>
+                <div class="req-content">
+                    <span id="req-recipient">ИП Назаров Карен Меликович</span>
+                    <button class="req-copy" onclick="copyToClipboard('req-recipient', this)">📋</button>
+                </div>
+            </div>
+
+            <div class="req-item">
+                <div class="req-label">ИНН</div>
+                <div class="req-content">
+                    <span id="req-inn">744302319571</span>
+                    <button class="req-copy" onclick="copyToClipboard('req-inn', this)">📋</button>
+                </div>
+            </div>
+
+            <div class="req-item">
+                <div class="req-label">Расчётный счёт</div>
+                <div class="req-content">
+                    <span id="req-account">40802810820001013120</span>
+                    <button class="req-copy" onclick="copyToClipboard('req-account', this)">📋</button>
+                </div>
+            </div>
+
+            <div class="req-item">
+                <div class="req-label">Банк</div>
+                <div class="req-content">
+                    <span id="req-bank">ООО "Банк Точка"</span>
+                    <button class="req-copy" onclick="copyToClipboard('req-bank', this)">📋</button>
+                </div>
+            </div>
+
+            <div class="req-item">
+                <div class="req-label">БИК</div>
+                <div class="req-content">
+                    <span id="req-bik">044525104</span>
+                    <button class="req-copy" onclick="copyToClipboard('req-bik', this)">📋</button>
+                </div>
+            </div>
+
+            <div class="req-item">
+                <div class="req-label">К/С (Корреспондентский счёт)</div>
+                <div class="req-content">
+                    <span id="req-ks">30101810745374525104</span>
+                    <button class="req-copy" onclick="copyToClipboard('req-ks', this)">📋</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
 <!-- FORM -->
 <section class="sect-dark" id="form">
     <div class="container">
@@ -954,7 +1054,7 @@
                 <p>Помогаем бизнесу не терять клиентов и автоматически возвращать их обратно.</p>
                 <div class="foot-soc"><a href="#" title="Telegram">✈️</a><a href="#" title="WhatsApp">💬</a><a href="#" title="VK">🅱️</a></div>
             </div>
-            <div class="foot-col"><h4>Навигация</h4><a href="#features">Возможности</a><a href="#screenshots">Интерфейс</a><a href="#faq">Вопросы</a><a href="#pricing">Цена</a></div>
+            <div class="foot-col"><h4>Навигация</h4><a href="#features">Возможности</a><a href="#screenshots">Интерфейс</a><a href="#faq">Вопросы</a><a href="#pricing">Цена</a><a href="#requisites">Реквизиты</a></div>
             <div class="foot-col"><h4>Для кого</h4><a href="#whom">Барбершопы</a><a href="#whom">Салоны красоты</a><a href="#whom">Стоматологии</a><a href="#whom">Автосервисы</a></div>
             <div class="foot-col"><h4>Контакты</h4><a href="tel:+79320165127">+7 (932) 016-51-27</a><a href="mailto:info@bizbot.ru">karen.nazarov172006@gmail.com</a><a href="#">Telegram: @Karen_7717</a></div>
         </div>
@@ -965,6 +1065,35 @@
 <div class="toast" id="toast">✅ Заявка отправлена! Мы свяжемся с вами в ближайшее время.</div>
 
 <script>
+// FAQ Accordion - только один открыт одновременно
+function toggleFaq(card) {
+    const grid = document.getElementById('faqGrid');
+    const allCards = grid.querySelectorAll('.faq-card');
+    
+    // Закрываем все карточки
+    allCards.forEach(c => c.classList.remove('open'));
+    
+    // Открываем нажатую карточку
+    card.classList.add('open');
+}
+
+// Копирование реквизитов
+function copyToClipboard(elementId, button) {
+    const element = document.getElementById(elementId);
+    const text = element.innerText;
+    
+    navigator.clipboard.writeText(text).then(() => {
+        button.classList.add('copied');
+        button.innerText = '✓';
+        setTimeout(() => {
+            button.classList.remove('copied');
+            button.innerText = '📋';
+        }, 2000);
+    }).catch(err => {
+        console.error('Ошибка копирования:', err);
+    });
+}
+
 // Navbar scroll
 window.addEventListener('scroll', () => {
     document.getElementById('navbar').classList.toggle('scrolled', window.scrollY > 50);
