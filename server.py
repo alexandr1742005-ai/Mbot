@@ -1,6 +1,10 @@
 import os
 import requests
 from flask import Flask, request, jsonify, send_from_directory
+print("=" * 50)
+print(f"✅ BOT_TOKEN задан: {bool(os.getenv('BOT_TOKEN'))}")
+print(f"✅ CHAT_ID задан: {os.getenv('CHAT_ID')}")
+print("=" * 50)
 
 app = Flask(__name__, static_folder='public', static_url_path='')
 
